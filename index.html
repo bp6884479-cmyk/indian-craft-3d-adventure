@@ -1,6 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Indiancraft 3D Adventure</title>
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#0b1a2a"><meta name="screen-orientation" content="landscape"><meta name="x5-orientation" content="landscape"><meta name="x5-fullscreen" content="true"><meta name="full-screen" content="yes"><meta name="browsermode" content="application">
-<script>try{var __m={name:'Indiancraft 3D Adventure',short_name:'Indiancraft 3D',display:'fullscreen',orientation:'landscape',background_color:'#0b1a2a',theme_color:'#0b1a2a',start_url:'.'},__l=document.createElement('link');__l.rel='manifest';__l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(__m));document.head.appendChild(__l)}catch(e){}</script>
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,interactive-widget=resizes-content">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -4335,4 +4336,15 @@ gfx=function(q){_g(q);cl()};cl();
 /* (mobs beyond 70 blocks are already removed by the game) */
 })();
 </script>
+<style id="lpfix">
+/* Login panel: always compact single-column (same as the rotated/portrait look), never the wide 2-column strip */
+html body #login div.lp{grid-template-columns:1fr!important;width:min(330px,calc(var(--vw,1vw)*92))!important;max-width:92%!important;margin:auto!important;justify-items:center}
+html body #login div.lp>.lt,html body #login div.lp>.bn,html body #login div.lp>p,html body #login div.lp>#un,html body #login div.lp>#li,html body #login div.lp>#gu{grid-column:1!important}
+html body #login div.lp>.lt{grid-row:1!important;text-align:center}
+html body #login div.lp>.bn{grid-row:2!important}
+html body #login div.lp>p{grid-row:3!important}
+html body #login div.lp>#un{grid-row:4!important}
+html body #login div.lp>#li{grid-row:5!important;width:100%!important}
+html body #login div.lp>#gu{grid-row:6!important}
+</style>
 </body></html>
