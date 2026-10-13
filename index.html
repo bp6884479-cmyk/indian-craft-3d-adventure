@@ -74,7 +74,7 @@ button{background:#4a6b3a;color:#fff;border:0;border-radius:6px;padding:7px 11px
 #login #gu{grid-column:2;grid-row:3;width:100%!important;margin:0!important}
 #login .gb{padding:calc(var(--vh,1vh)*3) 8px!important}
 #boot .vt{font-size:clamp(28px,calc(var(--vh,1vh)*15),64px)}
-#fsh{display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:70;background:rgba(0,0,0,.6);border:1px solid #fff5;color:#fff;border-radius:20px;padding:6px 14px;font:13px system-ui;white-space:nowrap}
+#fsh{display:none!important;position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:70;background:rgba(0,0,0,.6);border:1px solid #fff5;color:#fff;border-radius:20px;padding:6px 14px;font:13px system-ui;white-space:nowrap}
 #gp{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,8,20,.72);align-items:center;justify-content:center}
 #gp .bx{width:min(640px,calc(var(--vw,1vw)*94));max-height:calc(var(--vh,1vh)*94);overflow:auto;background:linear-gradient(160deg,rgba(18,34,60,.97),rgba(8,14,28,.98));border:2px solid rgba(255,255,255,.25);border-radius:20px;padding:16px;box-sizing:border-box;animation:gpi .25s ease-out}
 @keyframes gpi{from{transform:scale(.9);opacity:0}}
@@ -513,7 +513,7 @@ function setB(x,y,z,id,m){const cx=x>>4,cz=z>>4,c=chunks.get(cx+','+cz);if(!c)re
 if(m)M.set(k,m);else M.delete(k);if([16,44,51].includes(id))TO.set(k,[x+.5,y+.5,z+.5]);else TO.delete(k);if(id==48)LV.set(k,[x,y,z]);else LV.delete(k);(ED[cx+','+cz]=ED[cx+','+cz]||{})[k]=id|((m|0)<<8);save();snd(id?260:130,.09,id?'square':'sawtooth');mesh(c);
 const lx=x&15,lz=z&15,nb=(a,b)=>{const n=chunks.get(a+','+b);if(n)mesh(n)};if(!lx)nb(cx-1,cz);if(lx==15)nb(cx+1,cz);if(!lz)nb(cx,cz-1);if(lz==15)nb(cx,cz+1)}
 /* ---------- renderer / scene ---------- */
-const R_=new THREE.WebGLRenderer({canvas:$('#c'),antialias:true,powerPreference:'high-performance'});
+const R_=new THREE.WebGLRenderer({canvas:$('#c'),antialias:!(navigator.maxTouchPoints>0),powerPreference:'high-performance'});
 R_.outputEncoding=THREE.sRGBEncoding;R_.toneMapping=THREE.ACESFilmicToneMapping;R_.toneMappingExposure=1.0;R_.shadowMap.type=THREE.PCFSoftShadowMap;
 const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(72,1,.1,600);cam.rotation.order='YXZ';sc.add(cam);sc.fog=new THREE.Fog(0x9ac9ef,28,88);
 const hemi=new THREE.HemisphereLight(0xd8efff,0x477b42,.76),sun=new THREE.DirectionalLight(0xfff3d6,1.02);sc.add(hemi,sun,sun.target);
@@ -808,7 +808,7 @@ if(SV&&SV.s){SV.s.forEach((s,i)=>S[i]=s);sel=SV.sel|0}else{add(107,1);add(108,1)
 for(let i=0;i<14;i++)mkMob([0,1,4,5,6][i%5],P.x+Math.random()*50-25,P.z+Math.random()*50-25);
 ui();$('#ld').textContent='World ready!'}
 $('#play').onclick=()=>{started=true;jbRest();$('#lv').style.display='block';if(tc)fs();if(tc)toast('Tap = place / open · Hold = break');$('#menu').style.display='none';if(!tc)$('#c').requestPointerLock&&$('#c').requestPointerLock()};
-function loop(now){requestAnimationFrame(loop);if(!booted){last=now;return}const raw=now-last,dt=Math.min(.05,raw/1000);last=now;frame++;if(started&&!paused&&raw<500){fpsE+=(raw-fpsE)*.04;if(fpsE>45){if(++lowN>360&&GQ>0&&autoQ){lowN=0;fpsE=16;gfx(GQ-1);toast('⚡ Performance mode: graphics lowered')}}else lowN=0}
+function loop(now){requestAnimationFrame(loop);if(!booted){last=now;return}const raw=now-last,dt=Math.min(.05,raw/1000);last=now;frame++;if(started&&!paused&&raw<500){fpsE+=(raw-fpsE)*.04;if(fpsE>36){if(++lowN>180&&GQ>0&&autoQ){lowN=0;fpsE=16;gfx(GQ-1);toast('⚡ Performance mode: graphics lowered')}}else lowN=0}
 if(started&&!dead&&!paused){physics(dt);if(!invOpen)mine(dt);else{brk=false}
 stream();updMobs(dt);updP(dt);
 for(let i=DS.length-1;i>=0;i--){const q=DS[i];q.t+=dt*4.2;const p=Math.min(1,q.t);q.g.rotation.y=(q.op?p:1-p)*1.5708;if(p>=1){sc.remove(q.g);DS.splice(i,1)}}
@@ -1572,11 +1572,11 @@ lg.classList.add('rdy');requestAnimationFrame(()=>requestAnimationFrame(()=>lg.c
 (()=>{'use strict';
 /* ---- graphics quality ---- */
 const QS=[
-{n:'LOW',d:'Best performance. No shadows, fewer lights and particles, short view distance.',rd:5,pr:1,sh:0,ms:1024,soft:0,pl:2,pf:.4},
-{n:'MEDIUM',d:'Balanced. Basic shadows, moderate lights and particles.',rd:7,pr:Math.min(devicePixelRatio,1.5),sh:1,ms:1024,soft:0,pl:4,pf:.7},
-{n:'HIGH',d:'Soft shadows, full lighting, glow, richer particles and water.',rd:9,pr:Math.min(devicePixelRatio,2),sh:1,ms:2048,soft:1,pl:6,pf:1},
-{n:'ULTRA HD',d:'Maximum the device supports: sharpest resolution and shadows, farthest view, most particles.',rd:tc?10:12,pr:tc?Math.min(devicePixelRatio,1.75):Math.min(devicePixelRatio*1.25,3),sh:1,ms:tc?2048:4096,soft:1,pl:6,pf:1.4,tight:1}];
-let UQ=3;try{const v=localStorage.getItem('bw3d_gq3');if(v!=null&&QS[+v])UQ=+v}catch(e){}
+{n:'LOW',d:'Best performance. No shadows, fewer lights and particles, short view distance.',rd:4,pr:Math.min(devicePixelRatio,1),sh:0,ms:1024,soft:0,pl:1,pf:.3},
+{n:'MEDIUM',d:'Balanced. Basic shadows, moderate lights and particles.',rd:6,pr:Math.min(devicePixelRatio,1.25),sh:1,ms:1024,soft:0,pl:3,pf:.6},
+{n:'HIGH',d:'Soft shadows, full lighting, glow, richer particles and water.',rd:8,pr:Math.min(devicePixelRatio,1.6),sh:1,ms:1024,soft:1,pl:5,pf:.9},
+{n:'ULTRA HD',d:'Maximum the device supports: sharpest resolution and shadows, farthest view, most particles.',rd:tc?9:12,pr:tc?Math.min(devicePixelRatio,1.75):Math.min(devicePixelRatio*1.25,3),sh:1,ms:tc?2048:4096,soft:1,pl:6,pf:1.4,tight:1}];
+let UQ=tc?1:2;try{const v=localStorage.getItem('bw3d_gq4');if(v!=null&&QS[+v])UQ=+v}catch(e){}
 let QF=1,lastQ=-1;
 const _bu=burst;burst=function(x,y,z,c,n,f){_bu(x,y,z,c,f?n:Math.max(1,Math.round(n*QF)),f)};
 const _wa=waterAnim;let wc=0;waterAnim=function(t){if(GQ==0&&(++wc%3))return;_wa(t)};
@@ -1587,7 +1587,7 @@ if(ch){lastQ=q;R_.shadowMap.enabled=!!Q.sh;sun.castShadow=!!Q.sh;R_.shadowMap.ty
 const ms=Math.min(Q.ms,R_.capabilities.maxTextureSize||2048);if(sun.shadow.mapSize.x!=ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
 const e=Q.tight?22:28;Object.assign(sun.shadow.camera,{left:-e,right:e,top:e,bottom:-e});sun.shadow.camera.updateProjectionMatrix();
 PL.forEach((l,i)=>l.visible=i<Q.pl);mO.needsUpdate=mT.needsUpdate=true;R_.shadowMap.needsUpdate=true;
-UQ=q;try{localStorage.setItem('bw3d_gq3',q)}catch(e){}paint()}};
+UQ=q;try{localStorage.setItem('bw3d_gq4',q)}catch(e){}paint()}};
 /* ---- panel ---- */
 const gp=document.createElement('div');gp.id='gp';
 gp.innerHTML='<div class="bx"><h2>🎚 GRAPHICS SETTINGS</h2><div class="gr">'+QS.map((q,i)=>`<button class="q" data-q="${i}"><b>${q.n}</b><span>${q.d}</span></button>`).join('')+'</div><div style="text-align:center;margin-top:12px"><button id="gp_x" style="background:#933;font-size:16px;padding:10px 28px;border-radius:10px">Close</button></div></div>';
@@ -1606,7 +1606,10 @@ gfx(UQ);
 const fsh=document.createElement('div');fsh.id='fsh';fsh.textContent='⛶ Tap for fullscreen landscape';document.body.appendChild(fsh);
 let fsd=0;const goFs=()=>{try{fs()}catch(e){}};
 fsh.onclick=goFs;
-window.__chkH=()=>{fsh.style.display=(tc&&PORT()&&!document.fullscreenElement&&!booted)?'block':'none'};
+window.__chkH=()=>{fsh.style.display='none'};fsh.style.display='none';fsh.remove();
+/* auto fullscreen + landscape: try on load, again on first touch/click (browsers need a gesture), no button shown */
+try{screen.orientation.lock('landscape').catch(()=>{})}catch(x){}try{goFs()}catch(x){}
+['touchend','pointerup','click'].forEach(ev=>document.addEventListener(ev,()=>{if(!document.fullscreenElement)goFs()},{capture:true,once:false,passive:true}));
 document.addEventListener('pointerup',e=>{if(!tc||e.target.tagName=='INPUT'||document.fullscreenElement)return;goFs()},true);
 /* follow the phone in BOTH directions: if fullscreen/lock is not active and the phone is held upright, rotate the game to whichever side the phone is turned */
 let LKS='';addEventListener('deviceorientation',e=>{if(e.gamma==null)return;const g=e.gamma;
@@ -4295,4 +4298,35 @@ body #bwkb .kk:active{transform:translateY(2px);filter:brightness(1.25)}
 body #bwkb .kon{background:var(--nz),linear-gradient(rgba(255,255,255,.2),rgba(0,0,0,.2)),#3f9a2e!important}
 body #bwkb .kdn{background:var(--nz),linear-gradient(rgba(255,255,255,.2),rgba(0,0,0,.2)),#3a78b8!important}
 </style>
+
+<script>
+/* ===== PERFORMANCE PATCH ===== */
+(()=>{
+const T=navigator.maxTouchPoints>0||'ontouchstart' in window;
+/* 1. shadow map: render only every 2nd frame on phones (it re-draws the whole scene each time) */
+try{R_.shadowMap.autoUpdate=false;R_.shadowMap.needsUpdate=true}catch(e){}
+/* 2. sky/weather/lighting update: every 2nd frame on phones, with accumulated time (day cycle unchanged) */
+const _env=env;let ea=0;
+env=function(dt){
+ if(!T){R_.shadowMap.needsUpdate=true;_env(dt);return}
+ ea+=dt;
+ if(frame&1){_env(ea);ea=0}else R_.shadowMap.needsUpdate=true;
+};
+/* 3. chunk streaming with a time budget: never build a chunk generation + 2 meshes in one frame */
+stream=function(){
+ const pc=Math.floor(P.x)>>4,pz=Math.floor(P.z)>>4,t0=performance.now(),mx=T?1:2;let m=0;
+ for(const[a,b]of OFF){if(a*a+b*b>RD*RD)break;const c=chunks.get((pc+a)+','+(pz+b));
+  if(c&&c.dirty){mesh(c);if(++m>=mx||performance.now()-t0>4)break}}
+ if(performance.now()-t0<(T?5:8)){
+  for(const[a,b]of OFF){if(a*a+b*b>RD*RD)break;if(!chunks.has((pc+a)+','+(pz+b))){mk(pc+a,pz+b);break}}}
+ if(frame%90==0)for(const[k,c]of chunks)if((c.cx-pc)**2+(c.cz-pz)**2>(RD+2)**2){c.ms.forEach(q=>{sc.remove(q);q.geometry.dispose()});chunks.delete(k)}
+};
+/* 4. fewer clouds (transparent overdraw) on LOW / MEDIUM */
+const _g=gfx;
+const cl=()=>{try{clouds.forEach((m,i)=>m.visible=GQ>=2||i%3==0)}catch(e){}};
+gfx=function(q){_g(q);cl()};cl();
+/* 5. skip mob AI/animation work for mobs that are far away on phones */
+/* (mobs beyond 70 blocks are already removed by the game) */
+})();
+</script>
 </body></html>
