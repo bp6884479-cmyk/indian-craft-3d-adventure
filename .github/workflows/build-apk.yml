@@ -25,12 +25,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Capacitor & build
+      - name: Install dependencies & Build
         run: |
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "IndianCraft" "com.indiancraft.game" --web-dir=. --npm-client npm
-          npx cap add android
+          npm install
           npx cap sync
           cd android
           chmod +x gradlew
