@@ -1,4 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Indiancraft 3D Adventure</title>
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#0b1a2a"><meta name="screen-orientation" content="landscape"><meta name="x5-orientation" content="landscape"><meta name="x5-fullscreen" content="true"><meta name="full-screen" content="yes"><meta name="browsermode" content="application">
+<script>try{var __m={name:'Indiancraft 3D Adventure',short_name:'Indiancraft 3D',display:'fullscreen',orientation:'landscape',background_color:'#0b1a2a',theme_color:'#0b1a2a',start_url:'.'},__l=document.createElement('link');__l.rel='manifest';__l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(__m));document.head.appendChild(__l)}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,interactive-widget=resizes-content">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -714,7 +716,7 @@ if(frame%120==0&&mobs.filter(m=>m.type!=2&&m.type!=3&&m.type!=7).length<12){cons
 if(frame%80==0&&mobs.filter(m=>m.type==7).length<8){const a=Math.random()*6.28,r=6+Math.random()*20;mkX(7,P.x+Math.cos(a)*r,P.z+Math.sin(a)*r)}}
 /* ---------- sky, weather ---------- */
 let tod=.2,raining=0,rainT=70,rainK=0,NK=0;
-function fs(){const lk=()=>{try{screen.orientation.lock('landscape').catch(()=>{})}catch(x){}};try{const e=document.documentElement,r=(e.requestFullscreen||e.webkitRequestFullscreen).call(e);if(r&&r.then)r.then(lk).catch(lk);else lk()}catch(x){lk()}}
+function fs(){const lk=()=>{try{screen.orientation.lock('landscape').catch(()=>{})}catch(x){}};try{const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen||e.mozRequestFullScreen||e.msRequestFullscreen,r=f.call(e,{navigationUI:'hide'});if(r&&r.then)r.then(lk).catch(lk);else lk()}catch(x){lk()}}
 const dome=new THREE.Mesh(new THREE.SphereGeometry(450,16,10),new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide,fog:false,depthWrite:false}));dome.renderOrder=-2;dome.frustumCulled=false;sc.add(dome);dome.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(dome.geometry.attributes.position.count*3),3));
 const sunM=new THREE.Mesh(new THREE.SphereGeometry(12,12,8),new THREE.MeshBasicMaterial({color:0xfff2a0,fog:false})),moonM=new THREE.Mesh(new THREE.SphereGeometry(8,12,8),new THREE.MeshBasicMaterial({color:0xdde6ff,fog:false}));sc.add(sunM,moonM);
 const mgc=document.createElement('canvas');mgc.width=mgc.height=128;{const g=mgc.getContext('2d'),r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(220,232,255,1)');r.addColorStop(.14,'rgba(170,200,255,.6)');r.addColorStop(.45,'rgba(110,150,255,.22)');r.addColorStop(1,'rgba(120,150,255,0)');g.fillStyle=r;g.fillRect(0,0,128,128)}
@@ -1611,6 +1613,10 @@ window.__chkH=()=>{fsh.style.display='none'};fsh.style.display='none';fsh.remove
 try{screen.orientation.lock('landscape').catch(()=>{})}catch(x){}try{goFs()}catch(x){}
 ['touchend','pointerup','click'].forEach(ev=>document.addEventListener(ev,()=>{if(!document.fullscreenElement)goFs()},{capture:true,once:false,passive:true}));
 document.addEventListener('pointerup',e=>{if(!tc||e.target.tagName=='INPUT'||document.fullscreenElement)return;goFs()},true);
+/* try as early as possible: first touch/press of any kind, repeated attempts after load, and whenever the app comes back to the front */
+['touchstart','pointerdown','mousedown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{if(!document.fullscreenElement)goFs()},{capture:true,passive:true}));
+[300,1200,3000].forEach(t=>setTimeout(()=>{if(!document.fullscreenElement)goFs()},t));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.fullscreenElement)goFs()});addEventListener('focus',()=>{if(!document.fullscreenElement)goFs()});
 /* follow the phone in BOTH directions: if fullscreen/lock is not active and the phone is held upright, rotate the game to whichever side the phone is turned */
 let LKS='';addEventListener('deviceorientation',e=>{if(e.gamma==null)return;const g=e.gamma;
 /* fullscreen: switch the landscape lock to whichever side the phone is turned, so BOTH sides work (plain 'landscape' lock can get stuck on one side) */
