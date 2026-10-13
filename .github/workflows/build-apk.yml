@@ -19,17 +19,80 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies & Build
+      - name: Copy game files into a fresh app folder
         run: |
-          npm install
-          npx cap sync
-          cd android
+          mkdir -p build/www
+          cp index.html build/www/index.html
+          for f in manifest.webmanifest icon-192.png icon-512.png; do
+            if [ -f "$f" ]; then cp "$f" build/www/; fi
+          done
+
+      - name: Create Capacitor Android project
+        working-directory: build
+        run: |
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npx cap init "Indian Craft 3D" com.bgamesstudio.indiancraft3dadventure --web-dir www
+          npx cap add android
+
+      - name: Landscape + fullscreen (no title bar, no status/navigation bar)
+        working-directory: build
+        run: |
+          MAN=android/app/src/main/AndroidManifest.xml
+          sed -i '0,/<activity/s//<activity android:screenOrientation="sensorLandscape"/' "$MAN"
+          STY=android/app/src/main/res/values/styles.xml
+          sed -i '/<style name="AppTheme.NoActionBar/a\        <item name="android:windowFullscreen">true</item>' "$STY"
+          MAIN=$(find android/app/src/main/java -name MainActivity.java | head -n 1)
+          cat > "$MAIN" <<'JAVA'
+          package com.bgamesstudio.indiancraft3dadventure;
+
+          import android.os.Bundle;
+          import androidx.core.view.WindowCompat;
+          import androidx.core.view.WindowInsetsCompat;
+          import androidx.core.view.WindowInsetsControllerCompat;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+            @Override
+            public void onCreate(Bundle savedInstanceState) {
+              super.onCreate(savedInstanceState);
+              hideBars();
+            }
+            @Override
+            public void onWindowFocusChanged(boolean hasFocus) {
+              super.onWindowFocusChanged(hasFocus);
+              if (hasFocus) hideBars();
+            }
+            private void hideBars() {
+              WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+              WindowInsetsControllerCompat c = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+              c.hide(WindowInsetsCompat.Type.systemBars());
+              c.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+          }
+          JAVA
+
+      - name: App icon (uses icon-512.png from the repo if present)
+        working-directory: build
+        run: |
+          if [ -f www/icon-512.png ]; then
+            for d in android/app/src/main/res/mipmap-*; do
+              case "$d" in *anydpi*) continue;; esac
+              cp www/icon-512.png "$d/ic_launcher.png"
+              cp www/icon-512.png "$d/ic_launcher_round.png"
+            done
+            rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher*.xml
+          fi
+
+      - name: Build APK
+        working-directory: build/android
+        run: |
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
 
@@ -37,4 +100,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Indian-Craft-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: build/android/app/build/outputs/apk/debug/app-debug.apk
